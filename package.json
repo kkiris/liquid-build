@@ -1,0 +1,21 @@
+{
+	"name": "liquid-package",
+	"version": "0.0.1",
+	"author": "kkiris",
+	"description": "Renders Liquid templates and packages them alongside static files, with stacking for global, grouped, and build-specific config, templates, and files.",
+	"main": "script/render.js",
+	"scripts": {
+		"render": "node script/render.js",
+		"package": "node script/package.js",
+		"liquid-build": "npm run render && npm run package"
+	},
+	"dependencies": {
+		"archiver": "^7.0.1",
+		"fs-extra": "^11.3.2",
+		"liquidjs": "^10.21.1"
+  },
+	"engines": {
+		"node": ">=18.0.0"
+	},
+	"license": "EUPL-1.2"
+}

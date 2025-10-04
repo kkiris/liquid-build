@@ -1,0 +1,2 @@
+- run: node script/render.js
+- run: node script/package.js
