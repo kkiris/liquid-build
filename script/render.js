@@ -2,7 +2,10 @@ const { Liquid } = require('liquidjs');
 const fs = require('fs-extra');
 const path = require('path');
 
-const engine = new Liquid();
+const engine = new Liquid({
+	root: [path.join(__dirname, '../include')],
+	extname: '.liquid',
+});
 
 const globalConfigPath = path.join(__dirname, '../config/global.json');
 const sharedConfigPath = path.join(__dirname, '../config/shared.json');
@@ -53,6 +56,18 @@ async function renderTemplates() {
 	await fs.ensureDir(renderedDir);
 
 	for (const [build, buildConfig] of Object.entries(buildsConfig)) {
+		const outputDir = path.join(renderedDir, build);
+
+		// clean build's rendered dir
+const dirExists = await fs.pathExists(outputDir);
+if (dirExists) {
+	const files = await fs.readdir(outputDir);
+	if (files.length > 0) {
+		await fs.remove(outputDir);
+		console.log(`🧹 Cleaned existing rendered directory for build: ${build}`);
+	}
+}
+
 		const buildGroups = ['_global', ...(buildConfig.groups || [])];
 
 		const groupConfig = buildGroups.reduce((acc, group) => {
@@ -64,17 +79,17 @@ async function renderTemplates() {
 		}, {});
 
 		const context = {
-			build,			// the build key in builds.json
+			build,
 			...globalConfig,
 			...groupConfig,
-			...buildConfig
+			...buildConfig,
 		};
 
 		const renderedContext = renderConfigValues(context, context);
 
+		// render shared templates into build's rendered dir
 		for (const group of [...new Set(buildGroups)]) {
 			const groupTemplateDir = path.join(sharedDir, group);
-			const groupOutputDir = path.join(renderedDir, 'shared', group);
 
 			if (!(await fs.pathExists(groupTemplateDir))) continue;
 
@@ -84,7 +99,7 @@ async function renderTemplates() {
 				const rawTemplate = await fs.readFile(inputPath, 'utf8');
 				const rendered = await engine.parseAndRender(rawTemplate, renderedContext);
 
-				const outputPath = path.join(groupOutputDir, relativePath.replace(/\.liquid$/, ''));
+				const outputPath = path.join(outputDir, relativePath.replace(/\.liquid$/, ''));
 				await fs.ensureDir(path.dirname(outputPath));
 
 				let output = rendered;
@@ -105,27 +120,27 @@ async function renderTemplates() {
 						/"__INLINE__(\[[\d,\s]+\])__INLINE__"/g,
 						(_, content) => content.replace(/\s+/g, '')
 					);
-					console.log(`🧾 Formatted JSON: shared/${group}/${relativePath}`);
+					console.log(`🧾 Formatted JSON: ${build}/${relativePath}`);
 				} catch {
 					// not JSON, skip formatting
 				}
 
 				await fs.writeFile(outputPath, output);
-				console.log(`✅ Rendered: shared/${group}/${relativePath}`);
+				console.log(`✅ Rendered: ${build}/${relativePath}`);
 			}
 		}
 
+		// render build-specific templates
 		const buildTemplateDir = path.join(buildDir, build);
 		if (await fs.pathExists(buildTemplateDir)) {
 			const templates = findLiquids(buildTemplateDir);
-			const buildOutputDir = path.join(renderedDir, 'build', build);
 
 			for (const relativePath of templates) {
 				const inputPath = path.join(buildTemplateDir, relativePath);
 				const rawTemplate = await fs.readFile(inputPath, 'utf8');
 				const rendered = await engine.parseAndRender(rawTemplate, renderedContext);
 
-				const outputPath = path.join(buildOutputDir, relativePath.replace(/\.liquid$/, ''));
+				const outputPath = path.join(outputDir, relativePath.replace(/\.liquid$/, ''));
 				await fs.ensureDir(path.dirname(outputPath));
 
 				let output = rendered;
@@ -146,13 +161,13 @@ async function renderTemplates() {
 						/"__INLINE__(\[[\d,\s]+\])__INLINE__"/g,
 						(_, content) => content.replace(/\s+/g, '')
 					);
-					console.log(`🧾 Formatted JSON: build/${buildTag}/${relativePath}`);
+					console.log(`🧾 Formatted JSON: ${build}/${relativePath}`);
 				} catch {
 					// not JSON, skip formatting
 				}
 
 				await fs.writeFile(outputPath, output);
-				console.log(`✅ Rendered: build/${build}/${relativePath}`);
+				console.log(`✅ Rendered: ${build}/${relativePath}`);
 			}
 		}
 	}

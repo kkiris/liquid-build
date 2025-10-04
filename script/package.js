@@ -20,7 +20,7 @@ async function packageZips() {
 	await fs.ensureDir(outputDir);
 
 	for (const [build, buildConfig] of Object.entries(buildsConfig)) {
-		const groups = ['_global', ...(build.groups || [])];
+		const groups = ['_global', ...(buildConfig.groups || [])];
 
 		// merge config from groups
 		const groupConfig = groups.reduce((acc, group) => {
@@ -49,11 +49,11 @@ async function packageZips() {
 			if (await fs.pathExists(groupDir)) {
 				archive.glob('**/*', {
 					cwd: groupDir,
-					ignore: ['**/*.liquid']
+					ignore: ['**/*.liquid'],
 				});
-				console.log(`📁 Added static shared files from '${group}'`);
+				console.log(`📁 Added static shared files from group: '${group}'`);
 			} else {
-				console.warn(`⚠️ Shared group missing: ${groupDir}`);
+				console.warn(`⚠️ Shared group directory missing: ${groupDir}`);
 			}
 		}
 
@@ -62,28 +62,20 @@ async function packageZips() {
 		if (await fs.pathExists(buildStaticDir)) {
 			archive.glob('**/*', {
 				cwd: buildStaticDir,
-				ignore: ['**/*.liquid']
+				ignore: ['**/*.liquid'],
 			});
-			console.log(`📁 Added static build files from '${build}'`);
+			console.log(`📁 Added static build files from build: '${build}'`);
 		}
 
-		// add rendered shared templates
-		for (const group of groups) {
-			const renderedSharedGroupDir = path.join(renderedDir, 'shared', group);
-			if (await fs.pathExists(renderedSharedGroupDir)) {
-				archive.directory(renderedSharedGroupDir, false);
-				console.log(`🧾 Added rendered shared templates from '${group}'`);
-			}
-		}
-
-		// add rendered build templates
-		const renderedBuildDir = path.join(renderedDir, 'build', build);
+		// add rendered templates
+		const renderedBuildDir = path.join(renderedDir, build);
 		if (await fs.pathExists(renderedBuildDir)) {
 			archive.directory(renderedBuildDir, false);
-			console.log(`🧾 Added rendered build templates from '${build}'`);
+			console.log(`🧾 Added rendered templates from build: '${build}'`);
 		}
 
 		await archive.finalize();
+
 		console.log(`📦 Packaged: ${zipName}`);
 	}
 }
