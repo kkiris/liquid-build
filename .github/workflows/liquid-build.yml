@@ -21,13 +21,18 @@ jobs:
       - name: install dependencies
         run: npm install
         working-directory: liquid-build
-      - name: Render Templates
+      - name: render templates
         run: node liquid-build/script/render.js
         working-directory: ${{ github.workspace }}
         env:
           NODE_PATH: ${{ github.workspace }}/liquid-build/node_modules
-      - name: Package Builds
+      - name: package builds
         run: node liquid-build/script/package.js
         working-directory: ${{ github.workspace }}
         env:
-          NODE_PATH: ${{ github.workspace }}/liquid-build/node_modules
+          NODE_PATH: ${{ github.workspace }}/liquid-build/node_modules\
+      - name: upload artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: packaged-builds
+          path: packaged
