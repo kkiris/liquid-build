@@ -32,7 +32,8 @@ jobs:
         env:
           NODE_PATH: ${{ github.workspace }}/liquid-build/node_modules\
       - name: upload artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: packaged-builds
           path: packaged
+
