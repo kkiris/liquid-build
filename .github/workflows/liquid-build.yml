@@ -8,9 +8,19 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
+      - name: checkout kkiris/liquid-build
+        uses: actions/checkout@v5
+        with:
+          repository: 'kkiris/liquid-build'
+      - name: setup node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
       - name: npm install
         run: npm install
-      - name: Render
+      - name: checkout current repo
+        uses: actions/checkout@v5
+      - name: Render Templates
         run: node script/render.js
-      - name: Package
+      - name: Package Builds
         run: node script/package.js
