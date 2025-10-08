@@ -3,17 +3,17 @@ const fs = require('fs-extra');
 const path = require('path');
 
 const engine = new Liquid({
-	root: [path.join(__dirname, '../include')],
+	root: [path.join(process.cwd(), 'include')],
 	extname: '.liquid',
 });
 
-const globalConfigPath = path.join(__dirname, '../config/global.json');
-const sharedConfigPath = path.join(__dirname, '../config/shared.json');
-const buildsConfigPath = path.join(__dirname, '../config/builds.json');
+const globalConfigPath = path.join(process.cwd(), 'config/global.json');
+const sharedConfigPath = path.join(process.cwd(), 'config/shared.json');
+const buildsConfigPath = path.join(process.cwd(), 'config/builds.json');
 
-const sharedDir = path.join(__dirname, '../shared');
-const buildDir = path.join(__dirname, '../build');
-const renderedDir = path.join(__dirname, '../rendered');
+const sharedDir = path.join(process.cwd(), 'shared');
+const buildDir = path.join(process.cwd(), 'build');
+const renderedDir = path.join(process.cwd(), 'rendered');
 
 function findLiquids(dir, root = dir) {
 	const entries = fs.readdirSync(dir, { withFileTypes: true });

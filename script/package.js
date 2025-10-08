@@ -2,15 +2,15 @@ const fs = require('fs-extra');
 const path = require('path');
 const archiver = require('archiver');
 
-const globalConfigPath = path.join(__dirname, '../config/global.json');
-const sharedConfigPath = path.join(__dirname, '../config/shared.json');
-const buildsConfigPath = path.join(__dirname, '../config/builds.json');
+const globalConfigPath = path.join(process.cwd(), 'config/global.json');
+const sharedConfigPath = path.join(process.cwd(), 'config/shared.json');
+const buildsConfigPath = path.join(process.cwd(), 'config/builds.json');
 
-const staticBuildDir = path.join(__dirname, '../build');
-const staticSharedDir = path.join(__dirname, '../shared');
-const renderedDir = path.join(__dirname, '../rendered');
+const staticBuildDir = path.join(process.cwd(), 'build');
+const staticSharedDir = path.join(process.cwd(), 'shared');
+const renderedDir = path.join(process.cwd(), 'rendered');
 
-const outputDir = path.join(__dirname, '../packaged');
+const outputDir = path.join(process.cwd(), 'packaged');
 
 async function packageZips() {
 	const globalConfig = await fs.readJson(globalConfigPath);
