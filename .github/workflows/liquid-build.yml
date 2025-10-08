@@ -1,2 +1,12 @@
-- run: node script/render.js
-- run: node script/package.js
+name: Liquid Build
+on: 
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Render
+        run: node script/render.js
+      - name: Package
+        run: node script/package.js
