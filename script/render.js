@@ -108,6 +108,7 @@ if (dirExists) {
 					output = JSON.stringify(parsed, (key, value) => {
 						if (
 							Array.isArray(value) &&
+							value.length > 0 &&
 							value.length <= 3 &&
 							value.every(item => typeof item === 'number')
 						) {
@@ -149,6 +150,7 @@ if (dirExists) {
 					output = JSON.stringify(parsed, (key, value) => {
 						if (
 							Array.isArray(value) &&
+							value.length > 0 &&
 							value.length <= 3 &&
 							value.every(item => typeof item === 'number')
 						) {
