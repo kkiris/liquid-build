@@ -3,23 +3,24 @@ on:
   workflow_call:
   workflow_dispatch:
 
-
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: checkout kkiris/liquid-build
+      - name: checkout repo
+        uses: actions/checkout@v5
+      - name: checkout liquid-build
         uses: actions/checkout@v5
         with:
           repository: 'kkiris/liquid-build'
+          path: liquid-build
       - name: setup node
         uses: actions/setup-node@v4
         with:
           node-version: 18
-      - name: npm install
+      - name: install dependencies
         run: npm install
-      - name: checkout current repo
-        uses: actions/checkout@v5
+        working-directory: liquid-build
       - name: Render Templates
         run: node script/render.js
       - name: Package Builds
