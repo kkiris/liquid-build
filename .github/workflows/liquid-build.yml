@@ -23,5 +23,9 @@ jobs:
         working-directory: liquid-build
       - name: Render Templates
         run: node script/render.js
+        env:
+          NODE_PATH: ${{ github.workspace }}/liquid-build/node_modules
       - name: Package Builds
         run: node script/package.js
+        env:
+          NODE_PATH: ${{ github.workspace }}/liquid-build/node_modules
