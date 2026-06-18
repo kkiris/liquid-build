@@ -1,6 +1,6 @@
 {
 	"name": "liquid-build",
-	"version": "0.0.2",
+	"version": "0.1.0",
 	"author": "kkiris",
 	"description": "Renders Liquid templates and packages them alongside static files, with stacking for global, grouped, and build-specific config, templates, and files.",
 	"main": "script/render.js",
