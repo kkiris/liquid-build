@@ -1,6 +1,8 @@
 const fs = require('fs-extra');
 const path = require('path');
 const archiver = require('archiver');
+const { Liquid } = require('liquidjs');
+const engine = new Liquid();
 
 const globalConfigPath = path.join(process.cwd(), 'config/global.json');
 const sharedConfigPath = path.join(process.cwd(), 'config/shared.json');
@@ -31,11 +33,24 @@ async function packageZips() {
 			return acc;
 		}, {});
 
-		const buildName = buildConfig.name || groupConfig.name || globalConfig.name || 'addon';
-		const buildVersion = buildConfig.version || groupConfig.version || globalConfig.version || '0.0.0';
+		const packageName = buildConfig._pkg || groupConfig._pkg || globalConfig._pkg || 'package';
 		const ext = buildConfig._ext || groupConfig._ext || globalConfig._ext || 'zip';
 
-		const zipName = `${buildName} v${buildVersion}+${build}.${ext}`;
+		const context = {
+			...globalConfig,
+			...groupConfig,
+			...buildConfig,
+			_build: build,
+			_pkg: packageName,
+			_ext: ext,
+		};
+
+		const outputTemplate =
+			buildConfig._output || groupConfig._output || globalConfig._output ||
+			`${packageName}_${build}.${ext}`;
+
+		const zipName = engine.parseAndRenderSync(outputTemplate, context);
+
 		const zipPath = path.join(outputDir, zipName);
 
 		const archive = archiver('zip', { zlib: { level: 9 } });
@@ -74,7 +89,13 @@ async function packageZips() {
 			console.log(`🧾 Added rendered templates from build: '${build}'`);
 		}
 
-		await archive.finalize();
+		await new Promise((resolve, reject) => {
+			stream.on('close', resolve);
+			stream.on('error', reject);
+			archive.on('error', reject);
+
+			archive.finalize();
+		});
 
 		console.log(`📦 Packaged: ${zipName}`);
 	}
