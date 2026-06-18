@@ -79,10 +79,10 @@ if (dirExists) {
 		}, {});
 
 		const context = {
-			build,
 			...globalConfig,
 			...groupConfig,
 			...buildConfig,
+			_build: build
 		};
 
 		const renderedContext = renderConfigValues(context, context);
